@@ -63,15 +63,16 @@ public class ResourceController : MonoBehaviour
     {
         double unlockCost = GetUnlockCost();
 
-        if (GameManager.instance.TotalGold < unlockCost)
+        if (GameManager.Instance.TotalGold < unlockCost)
         {
             return;
         }
         
-        GameManager.instance.AddGold(-unlockCost);
+        GameManager.Instance.AddGold(-unlockCost);
         
         SetUnlocked(true);
-        GameManager.instance.ShowNextResource();
+        AchievementController.Instance.UnlockAchievement(AchievementType.UnlockResource, _config.name);
+        GameManager.Instance.ShowNextResource();
     }
 
     public void SetUnlocked(bool unlocked)
@@ -86,12 +87,12 @@ public class ResourceController : MonoBehaviour
     {
         double upgradeCost = GetUpgradeCost();
 
-        if (GameManager.instance.TotalGold < upgradeCost)
+        if (GameManager.Instance.TotalGold < upgradeCost)
         {
             return;
         }
         
-        GameManager.instance.AddGold(-upgradeCost);
+        GameManager.Instance.AddGold(-upgradeCost);
         _level++;
 
         resourceUpgradeCost.text = $"Upgrade Cost\n{GetUpgradeCost()}";

@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
 {
     private static GameManager _instance = null;
 
-    public static GameManager instance
+    public static GameManager Instance
     {
         get
         {
