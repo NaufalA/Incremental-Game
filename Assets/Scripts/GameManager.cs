@@ -71,13 +71,50 @@ public class GameManager : MonoBehaviour
 
     private void AddAllResources()
     {
+        bool showResources = true;
         foreach (ResourceConfig config in resourceConfigs)
         {
             GameObject obj = Instantiate(resourcesPrefab.gameObject, resourceParent, false);
             ResourceController resource = obj.GetComponent<ResourceController>();
             
             resource.SetConfig(config);
+            obj.gameObject.SetActive(showResources);
+
+            if (showResources && !resource.isUnlocked)
+            {
+                showResources = false;
+            }
+            
             _activeResources.Add(resource);
+        }
+    }
+
+    public void ShowNextResource()
+    {
+        foreach (ResourceController resource in _activeResources)
+        {
+            if (!resource.gameObject.activeSelf)
+            {
+                resource.gameObject.SetActive(true);
+                break;
+            }
+        }
+    }
+
+    private void CheckResourceCost()
+    {
+        foreach (ResourceController resource in _activeResources)
+        {
+            bool isBuyable;
+            if (resource.isUnlocked)
+            {
+                isBuyable = TotalGold >= resource.GetUpgradeCost();
+            }
+            else
+            {
+                isBuyable = TotalGold >= resource.GetUnlockCost();
+            }
+            resource.resourceImage.sprite = resourceSprites[isBuyable ? 1 : 0];
         }
     }
 
@@ -87,7 +124,10 @@ public class GameManager : MonoBehaviour
 
         foreach (ResourceController resource in _activeResources)
         {
-            output += resource.GetOutput();
+            if (resource.isUnlocked)
+            {
+                output += resource.GetOutput();
+            }
         }
 
         output *= autoCollectPercentage;
@@ -107,7 +147,10 @@ public class GameManager : MonoBehaviour
         double output = 0;
         foreach (ResourceController resource in _activeResources)
         {
-            output += resource.GetOutput();
+            if (resource.isUnlocked)
+            {
+                output += resource.GetOutput();
+            }
         }
 
         TapText tapText = GetOrCreateTapText();
@@ -132,14 +175,5 @@ public class GameManager : MonoBehaviour
         }
 
         return tapText;
-    }
-
-    private void CheckResourceCost()
-    {
-        foreach (ResourceController resource in _activeResources)
-        {
-            bool isBuyable = TotalGold >= resource.GetUpgradeCost();
-            resource.resourceImage.sprite = resourceSprites[isBuyable ? 1 : 0];
-        }
     }
 }
