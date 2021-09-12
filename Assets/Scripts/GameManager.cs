@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -47,14 +48,17 @@ public class GameManager : MonoBehaviour
     private double _totalGold;
     public double TotalGold => _totalGold;
 
+    private double _totalSpend;
+    public double TotalSpend => _totalSpend;
+
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         AddAllResources();
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         _collectSecond += Time.unscaledDeltaTime;
         if (_collectSecond >= 1f)
@@ -140,6 +144,13 @@ public class GameManager : MonoBehaviour
     {
         _totalGold += value;
         goldInfo.text = $"Gold : {_totalGold.ToString("0")}";
+        AchievementController.Instance.CheckAchievement(AchievementType.AccumulateGold, GameManager.Instance.TotalGold);
+    }
+
+    public void AddSpend(double value)
+    {
+        _totalSpend += value;
+        AchievementController.Instance.CheckAchievement(AchievementType.SpendGold, GameManager.Instance.TotalSpend);
     }
 
     public void CollectByTap(Vector3 tapPosition, Transform parent)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -69,9 +70,10 @@ public class ResourceController : MonoBehaviour
         }
         
         GameManager.Instance.AddGold(-unlockCost);
+        GameManager.Instance.AddSpend(unlockCost);
         
         SetUnlocked(true);
-        AchievementController.Instance.UnlockAchievement(AchievementType.UnlockResource, _config.name);
+        AchievementController.Instance.CheckAchievement(AchievementType.UnlockResource, _config.name);
         GameManager.Instance.ShowNextResource();
     }
 
@@ -93,6 +95,7 @@ public class ResourceController : MonoBehaviour
         }
         
         GameManager.Instance.AddGold(-upgradeCost);
+        GameManager.Instance.AddSpend(upgradeCost);
         _level++;
 
         resourceUpgradeCost.text = $"Upgrade Cost\n{GetUpgradeCost()}";

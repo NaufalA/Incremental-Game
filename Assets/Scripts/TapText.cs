@@ -16,7 +16,7 @@ public class TapText : MonoBehaviour
         _spawnTime = spawnTime;
     }
 
-    void Update()
+    private void Update()
     {
         _spawnTime -= Time.unscaledDeltaTime;
         if (_spawnTime <= 0f)
