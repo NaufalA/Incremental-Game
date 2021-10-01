@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace SaveGame
@@ -26,6 +27,11 @@ namespace SaveGame
         {
             string json = JsonUtility.ToJson(Progress);
             PlayerPrefs.SetString(PROGRESS_KEY, json);
+        }
+
+        public static bool HasResources(int index)
+        {
+            return index + 1 <= Progress.resourceLevels.Count;
         }
     }
 }

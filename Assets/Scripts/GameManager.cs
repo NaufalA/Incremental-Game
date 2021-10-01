@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using SaveGame;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -45,9 +46,6 @@ public class GameManager : MonoBehaviour
     public Sprite[] resourceSprites;
     private float _collectSecond;
 
-    private double _totalGold;
-    public double TotalGold => _totalGold;
-
     private double _totalSpend;
     public double TotalSpend => _totalSpend;
 
@@ -55,6 +53,8 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         AddAllResources();
+
+        goldInfo.text = $"Gold : {UserDataManager.Progress.gold:0}";
     }
 
     // Update is called once per frame
@@ -76,12 +76,14 @@ public class GameManager : MonoBehaviour
     private void AddAllResources()
     {
         bool showResources = true;
+        int index = 0;
+        
         foreach (ResourceConfig config in resourceConfigs)
         {
             GameObject obj = Instantiate(resourcesPrefab.gameObject, resourceParent, false);
             ResourceController resource = obj.GetComponent<ResourceController>();
             
-            resource.SetConfig(config);
+            resource.SetConfig(index, config);
             obj.gameObject.SetActive(showResources);
 
             if (showResources && !resource.isUnlocked)
@@ -90,6 +92,7 @@ public class GameManager : MonoBehaviour
             }
             
             _activeResources.Add(resource);
+            index++;
         }
     }
 
@@ -112,11 +115,11 @@ public class GameManager : MonoBehaviour
             bool isBuyable;
             if (resource.isUnlocked)
             {
-                isBuyable = TotalGold >= resource.GetUpgradeCost();
+                isBuyable = UserDataManager.Progress.gold >= resource.GetUpgradeCost();
             }
             else
             {
-                isBuyable = TotalGold >= resource.GetUnlockCost();
+                isBuyable = UserDataManager.Progress.gold >= resource.GetUnlockCost();
             }
             resource.resourceImage.sprite = resourceSprites[isBuyable ? 1 : 0];
         }
@@ -135,16 +138,19 @@ public class GameManager : MonoBehaviour
         }
 
         output *= autoCollectPercentage;
-        autoCollectInfo.text = $"Auto Collect : {output.ToString("F1")}/second";
+        autoCollectInfo.text = $"Auto Collect : {output:F1}/second";
         
         AddGold(output);
     }
 
     public void AddGold(double value)
     {
-        _totalGold += value;
-        goldInfo.text = $"Gold : {_totalGold.ToString("0")}";
-        AchievementController.Instance.CheckAchievement(AchievementType.AccumulateGold, GameManager.Instance.TotalGold);
+        UserDataManager.Progress.gold += value;
+        goldInfo.text = $"Gold : {UserDataManager.Progress.gold:0}";
+        
+        AchievementController.Instance.CheckAchievement(AchievementType.AccumulateGold, UserDataManager.Progress.gold);
+        
+        UserDataManager.Save();
     }
 
     public void AddSpend(double value)

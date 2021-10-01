@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using SaveGame;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,7 +18,24 @@ public class ResourceController : MonoBehaviour
     private ResourceConfig _config;
 
     public bool isUnlocked = false;
-    private int _level = 1;
+    
+    private int _index;
+    public int Level
+    {
+        set
+        {
+            UserDataManager.Progress.resourceLevels[_index] = value;
+            UserDataManager.Save();
+        }
+        get
+        {
+            if (UserDataManager.HasResources(_index))
+            {
+                return UserDataManager.Progress.resourceLevels[_index];
+            }
+            return 1;
+        }
+    }
 
     private void Start()
     {
@@ -34,25 +52,26 @@ public class ResourceController : MonoBehaviour
         });
     }
 
-    public void SetConfig(ResourceConfig config)
+    public void SetConfig(int index, ResourceConfig config)
     {
+        _index = index;
         _config = config;
 
-        resourceDescription.text = $"{_config.name} Lv.{_level}\n+{GetOutput().ToString("0")}";
+        resourceDescription.text = $"{_config.name} Lv.{Level}\n+{GetOutput().ToString("0")}";
         resourceUnlockCost.text = $"Unlock Cost\n{GetUnlockCost()}";
         resourceUpgradeCost.text = $"Upgrade Cost\n{GetUpgradeCost()}";
         
-        SetUnlocked(config.unlockCost == 0);
+        SetUnlocked(config.unlockCost == 0 || UserDataManager.HasResources(index));
     }
 
     public double GetOutput()
     {
-        return _config.output * _level;
+        return _config.output * Level;
     }
 
     public double GetUpgradeCost()
     {
-        return _config.upgradeCost * _level;
+        return _config.upgradeCost * Level;
     }
 
     public double GetUnlockCost()
@@ -64,7 +83,7 @@ public class ResourceController : MonoBehaviour
     {
         double unlockCost = GetUnlockCost();
 
-        if (GameManager.Instance.TotalGold < unlockCost)
+        if (UserDataManager.Progress.gold < unlockCost)
         {
             return;
         }
@@ -73,6 +92,7 @@ public class ResourceController : MonoBehaviour
         GameManager.Instance.AddSpend(unlockCost);
         
         SetUnlocked(true);
+        
         AchievementController.Instance.CheckAchievement(AchievementType.UnlockResource, _config.name);
         GameManager.Instance.ShowNextResource();
     }
@@ -80,6 +100,15 @@ public class ResourceController : MonoBehaviour
     public void SetUnlocked(bool unlocked)
     {
         isUnlocked = unlocked;
+        if (unlocked)
+        {
+            if (!UserDataManager.HasResources(_index))
+            {
+                UserDataManager.Progress.resourceLevels.Add(Level);
+                UserDataManager.Save();
+            }
+        }
+        
         resourceImage.color = isUnlocked ? Color.white : Color.grey;
         resourceUnlockCost.gameObject.SetActive(!unlocked);
         resourceUpgradeCost.gameObject.SetActive(unlocked);
@@ -89,16 +118,16 @@ public class ResourceController : MonoBehaviour
     {
         double upgradeCost = GetUpgradeCost();
 
-        if (GameManager.Instance.TotalGold < upgradeCost)
+        if (UserDataManager.Progress.gold < upgradeCost)
         {
             return;
         }
         
         GameManager.Instance.AddGold(-upgradeCost);
         GameManager.Instance.AddSpend(upgradeCost);
-        _level++;
+        Level++;
 
         resourceUpgradeCost.text = $"Upgrade Cost\n{GetUpgradeCost()}";
-        resourceDescription.text = $"{_config.name} Lv.{_level}\n+{GetOutput().ToString("0")}";
+        resourceDescription.text = $"{_config.name} Lv.{Level}\n+{GetOutput().ToString("0")}";
     }
 }
