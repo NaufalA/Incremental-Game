@@ -1,0 +1,13 @@
+Assets/Firebase/Editor/StorageDependencies.xml
+Assets/Firebase/Plugins/Firebase.Storage.dll
+Assets/Firebase/Plugins/Firebase.Storage.dll.mdb
+Assets/Firebase/Plugins/iOS/Firebase.Storage.dll
+Assets/Firebase/Plugins/iOS/Firebase.Storage.dll.mdb
+Assets/Firebase/Plugins/x86_64/FirebaseCppStorage.bundle
+Assets/Firebase/Plugins/x86_64/FirebaseCppStorage.dll
+Assets/Firebase/Plugins/x86_64/FirebaseCppStorage.so
+Assets/Firebase/m2repository/com/google/firebase/firebase-storage-unity/8.3.0/firebase-storage-unity-8.3.0.pom
+Assets/Firebase/m2repository/com/google/firebase/firebase-storage-unity/8.3.0/firebase-storage-unity-8.3.0.srcaar
+Assets/Firebase/m2repository/com/google/firebase/firebase-storage-unity/maven-metadata.xml
+Assets/Plugins/iOS/Firebase/libFirebaseCppStorage.a
+Assets/package.json
