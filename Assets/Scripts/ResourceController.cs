@@ -83,7 +83,7 @@ public class ResourceController : MonoBehaviour
     {
         double unlockCost = GetUnlockCost();
 
-        if (UserDataManager.Progress.gold < unlockCost)
+        if (UserDataManager.Progress.goldTotal < unlockCost)
         {
             return;
         }
@@ -118,7 +118,7 @@ public class ResourceController : MonoBehaviour
     {
         double upgradeCost = GetUpgradeCost();
 
-        if (UserDataManager.Progress.gold < upgradeCost)
+        if (UserDataManager.Progress.goldTotal < upgradeCost)
         {
             return;
         }

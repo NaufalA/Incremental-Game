@@ -39,6 +39,7 @@ public class GameManager : MonoBehaviour
 
     public Transform coinIcon;
     public Text goldInfo;
+    public Text goldSpentInfo;
     public Text autoCollectInfo;
 
     private List<ResourceController> _activeResources = new List<ResourceController>();
@@ -46,15 +47,13 @@ public class GameManager : MonoBehaviour
     public Sprite[] resourceSprites;
     private float _collectSecond;
 
-    private double _totalSpend;
-    public double TotalSpend => _totalSpend;
-
     // Start is called before the first frame update
     private void Start()
     {
         AddAllResources();
 
-        goldInfo.text = $"Gold : {UserDataManager.Progress.gold:0}";
+        goldInfo.text = $"Gold : {UserDataManager.Progress.goldTotal:0}";
+        goldSpentInfo.text = $"Gold Spent : {UserDataManager.Progress.goldSpent:0}";
     }
 
     // Update is called once per frame
@@ -115,11 +114,11 @@ public class GameManager : MonoBehaviour
             bool isBuyable;
             if (resource.isUnlocked)
             {
-                isBuyable = UserDataManager.Progress.gold >= resource.GetUpgradeCost();
+                isBuyable = UserDataManager.Progress.goldTotal >= resource.GetUpgradeCost();
             }
             else
             {
-                isBuyable = UserDataManager.Progress.gold >= resource.GetUnlockCost();
+                isBuyable = UserDataManager.Progress.goldTotal >= resource.GetUnlockCost();
             }
             resource.resourceImage.sprite = resourceSprites[isBuyable ? 1 : 0];
         }
@@ -145,18 +144,22 @@ public class GameManager : MonoBehaviour
 
     public void AddGold(double value)
     {
-        UserDataManager.Progress.gold += value;
-        goldInfo.text = $"Gold : {UserDataManager.Progress.gold:0}";
+        UserDataManager.Progress.goldTotal += value;
+        goldInfo.text = $"Gold : {UserDataManager.Progress.goldTotal:0}";
         
-        AchievementController.Instance.CheckAchievement(AchievementType.AccumulateGold, UserDataManager.Progress.gold);
+        AchievementController.Instance.CheckAchievement(AchievementType.AccumulateGold, UserDataManager.Progress.goldTotal);
         
         UserDataManager.Save();
     }
 
     public void AddSpend(double value)
     {
-        _totalSpend += value;
-        AchievementController.Instance.CheckAchievement(AchievementType.SpendGold, GameManager.Instance.TotalSpend);
+        UserDataManager.Progress.goldSpent += value;
+        goldSpentInfo.text = $"Gold Spent : {UserDataManager.Progress.goldSpent:0}";
+        
+        AchievementController.Instance.CheckAchievement(AchievementType.SpendGold, UserDataManager.Progress.goldSpent);
+        
+        UserDataManager.Save();
     }
 
     public void CollectByTap(Vector3 tapPosition, Transform parent)
