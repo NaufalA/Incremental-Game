@@ -42,10 +42,14 @@ public class GameManager : MonoBehaviour
     public Text goldSpentInfo;
     public Text autoCollectInfo;
 
+    public float saveDelay = 5f;
+
     private List<ResourceController> _activeResources = new List<ResourceController>();
     private List<TapText> _tapTextPool = new List<TapText>();
     public Sprite[] resourceSprites;
+    
     private float _collectSecond;
+    private float _saveDelayCounter;
 
     // Start is called before the first frame update
     private void Start()
@@ -59,7 +63,11 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        _collectSecond += Time.unscaledDeltaTime;
+        float deltaTime = Time.unscaledDeltaTime;
+
+        _saveDelayCounter -= deltaTime;
+        
+        _collectSecond += deltaTime;
         if (_collectSecond >= 1f)
         {
             CollectPerSecond();
@@ -149,7 +157,12 @@ public class GameManager : MonoBehaviour
         
         AchievementController.Instance.CheckAchievement(AchievementType.AccumulateGold, UserDataManager.Progress.goldTotal);
         
-        UserDataManager.Save();
+        UserDataManager.Save(_saveDelayCounter <= 0f);
+
+        if (_saveDelayCounter <= 0f)
+        {
+            _saveDelayCounter = saveDelay;
+        }
     }
 
     public void AddSpend(double value)
@@ -159,7 +172,12 @@ public class GameManager : MonoBehaviour
         
         AchievementController.Instance.CheckAchievement(AchievementType.SpendGold, UserDataManager.Progress.goldSpent);
         
-        UserDataManager.Save();
+        UserDataManager.Save(_saveDelayCounter <= 0f);
+
+        if (_saveDelayCounter <= 0f)
+        {
+            _saveDelayCounter = saveDelay;
+        }
     }
 
     public void CollectByTap(Vector3 tapPosition, Transform parent)
